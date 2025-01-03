@@ -9,5 +9,4 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_appId,
 };
 
-console.log(firebaseConfig);
 export const app = initializeApp(firebaseConfig);
