@@ -14,7 +14,6 @@ export const saveUserData = async (currentUser, axiosSecure) => {
       userData
     );
 
-    console.log("User data saved successfully:", data);
     return data; // Return data for further processing if needed
   } catch (error) {
     console.error(
