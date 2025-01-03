@@ -24,3 +24,13 @@ export const saveUserData = async (currentUser, axiosSecure) => {
     throw error; // Rethrow error for handling in the calling function
   }
 };
+
+// save img to imgBB and return photo url
+export const savePhotoImgBB = async (formData, axios) => {
+  const { data } = await axios.post(
+    `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+    formData
+  );
+  const photoURL = data?.data?.url;
+  return photoURL;
+};

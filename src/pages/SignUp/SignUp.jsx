@@ -5,7 +5,7 @@ import { TbFidgetSpinner } from "react-icons/tb";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
-import { saveUserData } from "../../utilies/utilies";
+import { savePhotoImgBB, saveUserData } from "../../utilies/utilies";
 
 const SignUp = () => {
   const { createUser, updateUserProfile, signInWithGoogle, loading } =
@@ -25,13 +25,8 @@ const SignUp = () => {
 
     try {
       // 1. add image to imgBB
-      const { data } = await axios.post(
-        `https://api.imgbb.com/1/upload?key=${
-          import.meta.env.VITE_IMGBB_API_KEY
-        }`,
-        formData
-      );
-      const photoURL = data?.data.url;
+
+      const photoURL = await savePhotoImgBB(formData, axios);
       // 2. User Registration
       const res = await createUser(email, password);
       // 3. Save username & profile photo

@@ -1,7 +1,59 @@
+import axios from "axios";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { TbFidgetSpinner } from "react-icons/tb";
+import { useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { savePhotoImgBB } from "../../utilies/utilies";
+
 const AddPlantForm = () => {
+  const [loading, setLoading] = useState(false);
+  const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const name = form.name.value;
+    const price = parseInt(form.price.value);
+    const quantity = parseInt(form.quantity.value);
+    const category = form.category.value;
+    const description = form.description.value;
+    const img = e.target.image.files[0];
+    if (!img) return toast("Must upload image");
+    const formImage = new FormData();
+    formImage.append("image", img);
+    try {
+      setLoading(true);
+      // save image to imgbb
+      const photoURL = await savePhotoImgBB(formImage, axios);
+
+      const plantData = {
+        name,
+        price,
+        quantity,
+        category,
+        description,
+        sellerName: user?.displayName,
+        sellerEmail: user?.email,
+        photo: photoURL,
+      };
+      const { data } = await axiosSecure.post("/plants", plantData);
+      toast.success(data?.message);
+      // navigate to my inventory route
+      navigate("/dashboard/my-inventory");
+      form.reset();
+    } catch (error) {
+      console.log(error);
+      toast.success(error?.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="w-full min-h-[calc(100vh-40px)] flex flex-col justify-center items-center text-gray-800 rounded-xl bg-gray-50">
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           <div className="space-y-6">
             {/* Name */}
@@ -107,7 +159,11 @@ const AddPlantForm = () => {
               type="submit"
               className="w-full p-3 mt-5 text-center font-medium text-white transition duration-200 rounded shadow-md bg-lime-500 "
             >
-              Save & Continue
+              {loading ? (
+                <TbFidgetSpinner className="animate-spin m-auto" />
+              ) : (
+                "Save & Continue"
+              )}
             </button>
           </div>
         </div>
